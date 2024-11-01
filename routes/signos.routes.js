@@ -14,6 +14,6 @@ router
     .post('/ganadores', signoController.obtenerganadores)
     .post('/actualizar', signoController.updatepassword)
     .post('/registraradmin', signoController.crearadmin)
-    .post('/crear', signoController.crearuser); // Nueva ruta para crear usuarios
+    .post('/crear', signoController.crearuser2); // Nueva ruta para crear usuarios
 
 module.exports = router;
