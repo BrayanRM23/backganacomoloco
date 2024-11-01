@@ -11,11 +11,6 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    info: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'UserInfo',
-        required: true
-    },
     birthdate: {
         type: Date,
         required: true
