@@ -222,7 +222,6 @@ const crearuser = async (req, res) => {
         const newUser = new User({
             username,
             password: hashedPassword,
-            info: savedUserInfo._id  // Asignar la referencia a UserInfo
         });
         await newUser.save();
 
