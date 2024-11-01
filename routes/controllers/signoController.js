@@ -4,6 +4,7 @@ const User = require('../user.model'); // Importa el modelo
 const Codigo = require('../codigo');
 const Premio = require('../Premio'); // Asegúrate de ajustar la ruta según tu estructura de carpetas
 const Admin = require('../Admin');
+const UserInfo = require('../UserInfo');
 
 
 const getAllSignos = async (req, res)=>{
@@ -187,38 +188,42 @@ const updatepassword = async (req, res) => {
 };
 
 
+
 const crearuser = async (req, res) => {
     const { username, password, birthdate, cedula, email, cellphone, city } = req.body;
 
     try {
-        // Verificar si el usuario ya existe
+        // Verificar si el usuario o la cédula ya existen
         const userExists = await User.findOne({ username });
         if (userExists) {
             return res.json({ resultado: "El usuario ya existe" });
         }
 
-        // Verificar si la cédula ya existe
-        const cedulaExists = await User.findOne({ cedula });
+        const cedulaExists = await UserInfo.findOne({ cedula });
         if (cedulaExists) {
             return res.json({ resultado: "La cédula ya está registrada" });
         }
 
         // Encriptar la contraseña antes de guardarla
-        const saltRounds = 10;  // Número de rondas para generar el hash
+        const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // Crear un nuevo usuario con la contraseña encriptada y los otros campos
-        const newUser = new User({
-            username,
-            password: hashedPassword,  // Guardar la contraseña encriptada
+        // Crear documento en UserInfo para la información personal
+        const newUserInfo = new UserInfo({
             birthdate,
             cedula,
             email,
             cellphone,
             city
         });
+        await newUserInfo.save();
 
-        // Guardar el nuevo usuario en la base de datos
+        // Crear el usuario principal, referenciando el documento de UserInfo
+        const newUser = new User({
+            username,
+            password: hashedPassword,
+            info: newUserInfo._id
+        });
         await newUser.save();
 
         return res.json({ resultado: "Usuario creado correctamente" });
