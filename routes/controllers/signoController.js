@@ -1,6 +1,6 @@
 const fs = require('fs/promises');
 const path = require('path');
-const User = require('../user.model'); // Importa el modelo
+const User = require('../user'); // Importa el modelo
 const Codigo = require('../codigo');
 const Premio = require('../Premio'); // Asegúrate de ajustar la ruta según tu estructura de carpetas
 const Admin = require('../Admin');
