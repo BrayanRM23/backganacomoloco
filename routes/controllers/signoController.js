@@ -193,7 +193,7 @@ const crearuser = async (req, res) => {
     const { username, password, birthdate, cedula, email, cellphone, city } = req.body;
 
     try {
-        // Verificar si el usuario o la cédula ya existen
+        // Verificar existencia de usuario y cédula
         const userExists = await User.findOne({ username });
         if (userExists) {
             return res.json({ resultado: "El usuario ya existe" });
@@ -204,11 +204,11 @@ const crearuser = async (req, res) => {
             return res.json({ resultado: "La cédula ya está registrada" });
         }
 
-        // Encriptar la contraseña antes de guardarla
+        // Encriptar contraseña
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // Crear documento en UserInfo para la información personal
+        // Crear documento en UserInfo
         const newUserInfo = new UserInfo({
             birthdate,
             cedula,
@@ -218,7 +218,7 @@ const crearuser = async (req, res) => {
         });
         await newUserInfo.save();
 
-        // Crear el usuario principal, referenciando el documento de UserInfo
+        // Crear documento en User
         const newUser = new User({
             username,
             password: hashedPassword,
