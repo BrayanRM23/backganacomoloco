@@ -193,38 +193,39 @@ const crearuser = async (req, res) => {
     const { username, password, birthdate, cedula, email, cellphone, city } = req.body;
 
     try {
-        // Verificar existencia de usuario y cédula
-        const userExists = await User.findOne({ username });
+        // Verificar si el username o la cédula ya existen
+        const [userExists, cedulaExists] = await Promise.all([
+            User.findOne({ username }),
+            UserInfo.findOne({ cedula })
+        ]);
+
         if (userExists) {
             return res.json({ resultado: "El usuario ya existe" });
         }
 
-        const cedulaExists = await UserInfo.findOne({ cedula });
         if (cedulaExists) {
             return res.json({ resultado: "La cédula ya está registrada" });
         }
 
-        // Encriptar contraseña
+        // Encriptar la contraseña antes de guardarla
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         // Crear documento en UserInfo
-        const newUserInfo = new UserInfo({
+        const newUserInfo = await UserInfo.create({
             birthdate,
             cedula,
             email,
             cellphone,
             city
         });
-        await newUserInfo.save();
 
-        // Crear documento en User
-        const newUser = new User({
+        // Crear el documento en User y asociar el ID de UserInfo
+        const newUser = await User.create({
             username,
             password: hashedPassword,
-            info: newUserInfo._id
+            info: newUserInfo._id  // Asignar la referencia
         });
-        await newUser.save();
 
         return res.json({ resultado: "Usuario creado correctamente" });
     } catch (error) {
@@ -232,6 +233,7 @@ const crearuser = async (req, res) => {
         return res.status(500).json({ resultado: "Error interno del servidor" });
     }
 };
+
 
 
 const crearadmin = async (req, res) => {
