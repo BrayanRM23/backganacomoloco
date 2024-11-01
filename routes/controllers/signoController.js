@@ -234,6 +234,47 @@ const crearuser = async (req, res) => {
     }
 };
 
+const crearuser2 = async (req, res) => {
+    const { username, password, birthdate, cedula, email, cellphone, city } = req.body;
+
+    try {
+        // Verificar si el usuario ya existe
+        const userExists = await User.findOne({ username });
+        if (userExists) {
+            return res.json({ resultado: "El usuario ya existe" });
+        }
+
+        // Verificar si la cédula ya existe
+        const cedulaExists = await User.findOne({ cedula });
+        if (cedulaExists) {
+            return res.json({ resultado: "La cédula ya está registrada" });
+        }
+
+        // Encriptar la contraseña antes de guardarla
+        const saltRounds = 10;  // Número de rondas para generar el hash
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        // Crear un nuevo usuario con la contraseña encriptada y los otros campos
+        const newUser = new User({
+            username,
+            password: hashedPassword,  // Guardar la contraseña encriptada
+            birthdate,
+            cedula,
+            email,
+            cellphone,
+            city
+        });
+
+        // Guardar el nuevo usuario en la base de datos
+        await newUser.save();
+
+        return res.json({ resultado: "Usuario creado correctamente" });
+    } catch (error) {
+        console.error("Error creando usuario:", error);
+        return res.status(500).json({ resultado: "Error interno del servidor" });
+    }
+};                            
+
 
 
 const crearadmin = async (req, res) => {
@@ -337,6 +378,7 @@ const obtenerganadores = async (req, res) => {
 
 module.exports = {
     getAllSignos,
+    crearuser2,
     obtenerganadores,
     compareadmin,
     crearadmin,
