@@ -11,25 +11,9 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    birthdate: {
-        type: Date,
-        required: true
-    },
-    cedula: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    email: {
-        type: String,
-        required: true
-    },
-    cellphone: {
-        type: String,
-        required: true
-    },
-    city: {
-        type: String,
+    info: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'UserInfo',
         required: true
     }
 });
