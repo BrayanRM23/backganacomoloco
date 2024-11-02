@@ -216,14 +216,19 @@ const crearuser = async (req, res) => {
             cellphone,
             city
         });
+        
         const savedUserInfo = await newUserInfo.save();
+        console.log("UserInfo creado con ID:", savedUserInfo._id);
 
         // Crear el documento User y asociar el ID de UserInfo
         const newUser = new User({
             username,
             password: hashedPassword,
+            info: savedUserInfo._id  // Asignar la referencia a UserInfo
         });
-        await newUser.save();
+        
+        const savedUser = await newUser.save();
+        console.log("Usuario creado con ID:", savedUser._id);
 
         return res.json({ resultado: "Usuario creado correctamente" });
     } catch (error) {
@@ -231,6 +236,7 @@ const crearuser = async (req, res) => {
         return res.status(500).json({ resultado: "Error interno del servidor" });
     }
 };
+
 
 
 const crearuser2 = async (req, res) => {
