@@ -221,10 +221,13 @@ const crearuser = async (req, res) => {
         // Crear el usuario principal, referenciando el documento de UserInfo
         const newUser = new User({
             username,
-            password: hashedPassword,
+            password: hashedPassword,  // Guardar la contraseña encriptada
             info: newUserInfo._id
         });
+
+        // Guardar el nuevo usuario en la base de datos
         await newUser.save();
+        
 
         return res.json({ resultado: "Usuario creado correctamente" });
     } catch (error) {
