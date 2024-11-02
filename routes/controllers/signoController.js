@@ -229,7 +229,7 @@ const crearuser = async (req, res) => {
             
             
         }catch(error){
-            console.error("Error creando usuario:", error);
+            console.error("nada mano:", error);
             return res.status(500).json({ resultado: "Error interno del servidor" });
 
         }
