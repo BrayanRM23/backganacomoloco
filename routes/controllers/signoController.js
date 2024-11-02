@@ -193,7 +193,7 @@ const crearuser = async (req, res) => {
     const { username, password, birthdate, cedula, email, cellphone, city } = req.body;
 
     try {
-        // Verificar si el username o la cédula ya existen
+        // Verificar si el usuario o la cédula ya existen
         const userExists = await User.findOne({ username });
         if (userExists) {
             return res.json({ resultado: "El usuario ya existe" });
@@ -208,7 +208,7 @@ const crearuser = async (req, res) => {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // Crear y guardar UserInfo primero
+        // Crear documento en UserInfo para la información personal
         const newUserInfo = new UserInfo({
             birthdate,
             cedula,
@@ -216,19 +216,15 @@ const crearuser = async (req, res) => {
             cellphone,
             city
         });
-        
-        const savedUserInfo = await newUserInfo.save();
-        console.log("UserInfo creado con ID:", savedUserInfo._id);
+        await newUserInfo.save();
 
-        // Crear el documento User y asociar el ID de UserInfo
+        // Crear el usuario principal, referenciando el documento de UserInfo
         const newUser = new User({
             username,
             password: hashedPassword,
-            info: savedUserInfo._id  // Asignar la referencia a UserInfo
+            info: newUserInfo._id
         });
-        
-        const savedUser = await newUser.save();
-        console.log("Usuario creado con ID:", savedUser._id);
+        await newUser.save();
 
         return res.json({ resultado: "Usuario creado correctamente" });
     } catch (error) {
@@ -236,6 +232,7 @@ const crearuser = async (req, res) => {
         return res.status(500).json({ resultado: "Error interno del servidor" });
     }
 };
+
 
 
 

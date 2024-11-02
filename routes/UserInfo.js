@@ -1,28 +1,29 @@
-// UserInfo.js
 const mongoose = require('mongoose');
 
 const UserInfoSchema = new mongoose.Schema({
     birthdate: {
         type: Date,
-        required: true
+        required: true,
     },
     cedula: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
     },
     email: {
         type: String,
-        required: true
+        required: true,
     },
     cellphone: {
         type: String,
-        required: true
+        required: true,
     },
     city: {
         type: String,
-        required: true
-    }
+        required: true,
+    },
 });
 
-module.exports = mongoose.model('UserInfo', UserInfoSchema);
+const UserInfo = mongoose.model('UserInfo', UserInfoSchema);
+
+module.exports = UserInfo;
