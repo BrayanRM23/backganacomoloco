@@ -217,23 +217,19 @@ const crearuser = async (req, res) => {
             city
         });
         await newUserInfo.save();
-        try{
-            const newUser = new User({
-                username,
-                password: hashedPassword,  // Guardar la contraseña encriptada
-                info: newUserInfo._id
-            });
-            // Guardar el nuevo usuario en la base de datos
-            await newUser.save();
-            return res.json({ resultado: "Usuario creado correctamente" });
-            
-            
-        }catch(error){
-            console.error("nada mano:", error);
-            return res.status(500).json({ resultado: "Error interno del servidor" });
 
-        }
+        // Crear el usuario principal, referenciando el documento de UserInfo
+        const newUser = new User({
+            username,
+            password: hashedPassword,  // Guardar la contraseña encriptada
+            info: newUserInfo._id
+        });
+
+        // Guardar el nuevo usuario en la base de datos
+        await newUser.save();
         
+
+        return res.json({ resultado: "Usuario creado correctamente" });
     } catch (error) {
         console.error("Error creando usuario:", error);
         return res.status(500).json({ resultado: "Error interno del servidor" });
