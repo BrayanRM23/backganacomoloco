@@ -193,7 +193,7 @@ const crearuser = async (req, res) => {
     const { username, password, birthdate, cedula, email, cellphone, city } = req.body;
 
     try {
-        // Verificar si el usuario o la cédula ya existen
+        // Verificar si el username o la cédula ya existen
         const userExists = await User.findOne({ username });
         if (userExists) {
             return res.json({ resultado: "El usuario ya existe" });
@@ -208,7 +208,7 @@ const crearuser = async (req, res) => {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // Crear documento en UserInfo para la información personal
+        // Primera parte: Crear y guardar UserInfo
         const newUserInfo = new UserInfo({
             birthdate,
             cedula,
@@ -216,18 +216,19 @@ const crearuser = async (req, res) => {
             cellphone,
             city
         });
-        await newUserInfo.save();
 
-        // Crear el usuario principal, referenciando el documento de UserInfo
+        const savedUserInfo = await newUserInfo.save(); // Guardar UserInfo primero
+        console.log("UserInfo guardado con ID:", savedUserInfo._id);
+
+        // Segunda parte: Crear el documento User y asignar la referencia a UserInfo
         const newUser = new User({
             username,
             password: hashedPassword,  // Guardar la contraseña encriptada
-            info: newUserInfo._id
+            info: savedUserInfo._id     // Asignar la referencia a UserInfo
         });
 
-        // Guardar el nuevo usuario en la base de datos
-        await newUser.save();
-        
+        await newUser.save(); // Guardar User en la base de datos
+        console.log("Usuario guardado con ID:", newUser._id);
 
         return res.json({ resultado: "Usuario creado correctamente" });
     } catch (error) {
