@@ -37,10 +37,10 @@ const registrarcodigo = async (req, res) => {
             await user.save();
         }
 
-        // Verificar si el código ya está registrado para ese usuario
-        const codigoExistente = await Codigo.findOne({ codigo, usuario: user._id });
-        if (codigoExistente) {
-            return res.status(400).json({ resultado: "El código ya ha sido registrado por este usuario" });
+        // Verificar si el código ya ha sido registrado por cualquier usuario
+        const codigoRegistrado = await Codigo.findOne({ codigo });
+        if (codigoRegistrado) {
+            return res.status(400).json({ resultado: "El código ya está en uso por otro usuario" });
         }
 
         // Crear el nuevo código asociado al usuario
