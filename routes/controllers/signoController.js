@@ -350,19 +350,27 @@ const obtenerganadores = async (req, res) => {
 
         // Buscar registros de los usuarios que tengan un código en la lista de códigos ganadores
         const ganadores = await Codigo.find({ codigo: { $in: codigosGanadores } })
-            .populate("usuario", "nombre cedula telefono") // Poblamos con datos de usuario
+            .populate({
+                path: "usuario",  // Poblamos usuario
+                select: "username info", // Solo obtenemos el username y el campo de referencia info
+                populate: {
+                    path: "info", // Poblamos la colección UserInfo usando el campo de referencia
+                    model: "UserInfo",
+                    select: "cedula cellphone", // Seleccionamos solo los campos necesarios de UserInfo
+                },
+            })
             .select("fechaRegistro codigo usuario"); // Seleccionar solo los campos necesarios
 
         // Formatear los datos para enviarlos al frontend
         const ganadoresData = ganadores.map((ganador) => {
             // Buscar el premio asociado al código
-            const premioData = codigosConPremio.find(premio => premio.codigo === ganador.codigo);
+            const premioData = codigosConPremio.find((premio) => premio.codigo === ganador.codigo);
 
             return {
                 fechaRegistro: ganador.fechaRegistro,
-                nombre: ganador.usuario?.nombre || "Nombre no disponible",
-                cedula: ganador.usuario?.cedula || "Cédula no disponible",
-                telefono: ganador.usuario?.telefono || "Teléfono no disponible",
+                nombre: ganador.usuario?.username || "Nombre no disponible",
+                cedula: ganador.usuario?.info?.cedula || "Cédula no disponible",
+                telefono: ganador.usuario?.info?.cellphone || "Teléfono no disponible",
                 codigo: ganador.codigo,
                 premio: premioData ? premioData.premio : "Sin premio",
             };
@@ -374,6 +382,7 @@ const obtenerganadores = async (req, res) => {
         return res.status(500).json({ resultado: "Error interno del servidor" });
     }
 };
+
 
 
 
